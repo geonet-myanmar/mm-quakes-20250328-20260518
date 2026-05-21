@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Myanmar - Interactive Seismic Hazard Monitor & Analysis Portal</title>
+    <meta name="description" content="Explore real-time and historical seismic data in Myanmar (Burma) using this advanced interactive web map. Analyze earthquake magnitudes, depth distribution, and timeline trends.">
+    
+    <!-- Local offline Mapping Libraries CSS -->
+    <link rel="stylesheet" href="lib/leaflet.min.css" />
+    <link rel="stylesheet" href="lib/MarkerCluster.css" />
+    <link rel="stylesheet" href="lib/MarkerCluster.Default.css" />
+    
+    <!-- Application CSS styling -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Header area containing name, dynamic stats ticker -->
+        <header class="app-header" role="banner">
+            <div class="logo-section">
+                <div class="logo-icon-container">
+                    <div class="logo-ring"></div>
+                    <div class="logo-ring"></div>
+                    <div class="logo-ring"></div>
+                    <div class="logo-dot"></div>
+                </div>
+                <div class="logo-title">
+                    <h1 id="app-main-title">AEGIS MYANMAR <span>SEISMIC MONITOR</span></h1>
+                </div>
+            </div>
+            
+            <!-- Live Ticker Stats showing high level insights -->
+            <div class="header-metrics" id="header-metrics-banner">
+                <div class="metric-item">
+                    <i data-lucide="activity"></i>
+                    <div>
+                        <div class="metric-label">Total Events</div>
+                        <div class="metric-value" id="stat-total-count">0</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <i data-lucide="zap"></i>
+                    <div>
+                        <div class="metric-label">Max Magnitude</div>
+                        <div class="metric-value highlight-red" id="stat-max-mag">0.0</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <i data-lucide="arrow-down"></i>
+                    <div>
+                        <div class="metric-label">Deepest Epicenter</div>
+                        <div class="metric-value" id="stat-deepest">0.0 km</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <i data-lucide="bell"></i>
+                    <div>
+                        <div class="metric-label">Major Events (&ge;5.5)</div>
+                        <div class="metric-value highlight-red" id="stat-major-count">0</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Core dashboard container -->
+        <main class="app-content" role="main">
+            
+            <!-- Left Sidebar: Controls, filters, base layer selectors -->
+            <section class="sidebar" id="sidebar-filters" aria-label="Filters Panel">
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="sliders-horizontal"></i>
+                        <span>Search & Filters</span>
+                    </div>
+                    
+                    <!-- Search Input -->
+                    <div class="control-group">
+                        <label class="control-label" for="search-filter">Keyword search</label>
+                        <div class="search-container">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-filter" class="search-input" placeholder="e.g. Mandalay, Mawlaik...">
+                        </div>
+                    </div>
+                    
+                    <!-- Magnitude slider -->
+                    <div class="control-group">
+                        <div class="control-label">
+                            <label for="mag-filter">Min Magnitude</label>
+                            <span class="control-val" id="mag-filter-val">3.0 M</span>
+                        </div>
+                        <input type="range" id="mag-filter" class="range-slider" min="3.0" max="7.7" step="0.1" value="3.0">
+                    </div>
+                    
+                    <!-- Depth selection tab filters -->
+                    <div class="control-group">
+                        <span class="control-label">Focal Depth Category</span>
+                        <div class="filter-tabs" id="depth-filter-tabs">
+                            <button class="filter-tab active" data-depth="all" id="depth-tab-all">All</button>
+                            <button class="filter-tab" data-depth="shallow" id="depth-tab-shallow">Shallow</button>
+                            <button class="filter-tab" data-depth="inter" id="depth-tab-inter">Medium</button>
+                            <button class="filter-tab" data-depth="deep" id="depth-tab-deep">Deep</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="map"></i>
+                        <span>Map Visualization</span>
+                    </div>
+                    
+                    <!-- Rendering mode selections -->
+                    <div class="control-group">
+                        <span class="control-label">Layer mode</span>
+                        
+                        <div class="vis-option active" data-vis="markers" id="vis-opt-markers">
+                            <div class="vis-option-desc">
+                                <span class="vis-title">Seismic Pins</span>
+                                <span class="vis-subtitle">Proportional pulsing SVG indicators</span>
+                            </div>
+                            <div class="vis-radio"></div>
+                        </div>
+                        
+                        <div class="vis-option" data-vis="clusters" id="vis-opt-clusters">
+                            <div class="vis-option-desc">
+                                <span class="vis-title">Marker Clustering</span>
+                                <span class="vis-subtitle">Group high density areas cleanly</span>
+                            </div>
+                            <div class="vis-radio"></div>
+                        </div>
+                        
+                        <div class="vis-option" data-vis="heatmap" id="vis-opt-heatmap">
+                            <div class="vis-option-desc">
+                                <span class="vis-title">Energy Heatmap</span>
+                                <span class="vis-subtitle">Density grid of seismic energy</span>
+                            </div>
+                            <div class="vis-radio"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Depth Color Code Legend -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="info"></i>
+                        <span>Focal Depth Legend</span>
+                    </div>
+                    <div class="depth-legend-container">
+                        <div class="depth-legend-item">
+                            <div class="depth-color-box shallow"></div>
+                            <span>Shallow (< 70 km) - Primary Crustal</span>
+                        </div>
+                        <div class="depth-legend-item">
+                            <div class="depth-color-box intermediate"></div>
+                            <span>Medium (70 - 150 km) - Subduction Zone</span>
+                        </div>
+                        <div class="depth-legend-item">
+                            <div class="depth-color-box deep"></div>
+                            <span>Deep (&gt; 150 km) - Upper Mantle</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </section>
+            
+            <!-- Map Canvas Panel containing leaflet map, floating playback controls -->
+            <section class="map-panel" aria-label="Interactive Map Area">
+                <!-- Mobile sidebar toggle btn -->
+                <button class="hud-btn sidebar-toggle-btn" id="mobile-toggle" aria-label="Toggle filters list">
+                    <i data-lucide="menu"></i>
+                </button>
+                
+                <div id="map"></div>
+                
+                <!-- Map HUD Controls (Floating Timeline Playback Banner) -->
+                <div class="map-hud">
+                    <div class="timeline-banner" role="region" aria-label="Timeline Player">
+                        <div class="playback-controls">
+                            <button class="hud-btn" id="timeline-prev" aria-label="Previous step">
+                                <i data-lucide="skip-back"></i>
+                            </button>
+                            <button class="hud-btn" id="timeline-play" aria-label="Play timeline">
+                                <i data-lucide="play" id="play-icon"></i>
+                            </button>
+                            <button class="hud-btn" id="timeline-next" aria-label="Next step">
+                                <i data-lucide="skip-forward"></i>
+                            </button>
+                            <button class="hud-btn" id="timeline-speed" aria-label="Playback speed" title="Adjust playback speed">
+                                <span style="font-size: 0.75rem; font-family: var(--font-mono); font-weight: 700;">1x</span>
+                            </button>
+                        </div>
+                        
+                        <div class="timeline-slider-container">
+                            <div class="timeline-info">
+                                <span>Historical Progression Time-Lapse</span>
+                                <span class="timeline-current-date" id="timeline-date-label">Initializing...</span>
+                            </div>
+                            <input type="range" id="timeline-progress" class="custom-progress-slider" min="0" max="100" value="0">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Right Sidebar: Interactive charts dashboard, Featured highlights -->
+            <section class="right-sidebar sidebar" id="sidebar-dashboard" aria-label="Analytics Dashboard">
+                
+                <!-- Dashboard Chart 1: Magnitude bar distribution -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="bar-chart-2"></i>
+                        <span>Magnitude Distribution</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-magnitude"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Chart 2: Depth vs Mag Scatter -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="trending-up"></i>
+                        <span>Depth vs. Magnitude</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-depth-mag"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Historic Event Carousel listing large-scale events -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i data-lucide="award"></i>
+                        <span>Major Historical Events</span>
+                    </div>
+                    <div class="featured-carousel" id="featured-events-carousel">
+                        <!-- Dynamically filled by app.js -->
+                    </div>
+                </div>
+                
+            </section>
+            
+        </main>
+        
+    </div>
+
+    <!-- Local offline Mapping and Charting Libraries -->
+    <script src="lib/leaflet.js"></script>
+    <script src="lib/leaflet.markercluster.js"></script>
+    <script src="lib/leaflet-heat.js"></script>
+    <script src="lib/chart.umd.min.js"></script>
+    <script src="lib/lucide.min.js"></script>
+    
+    <!-- Loaded Pre-parsed Local JS Database -->
+    <script src="data.js"></script>
+    
+    <!-- Primary App Script -->
+    <script src="app.js"></script>
+    
+</body>
+</html>

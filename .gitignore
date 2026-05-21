@@ -1,0 +1,15 @@
+# OS files
+desktop.ini
+DESKTOP.INI
+[Dd]esktop.ini
+Thumbs.db
+
+# Screenshots
+Screenshot*.png
+
+# Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
