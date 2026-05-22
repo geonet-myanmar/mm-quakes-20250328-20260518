@@ -38,6 +38,7 @@
             if (typeof L === 'undefined') throw new Error("Leaflet Mapping library is not loaded. Ensure local/CDN script is active.");
             if (typeof Chart === 'undefined') throw new Error("Chart.js library is not loaded. Ensure local/CDN script is active.");
             if (typeof EARTHQUAKE_DATA === 'undefined') throw new Error("EARTHQUAKE_DATA database (data.js) is not loaded.");
+            if (typeof TECTONIC_DATA === 'undefined') throw new Error("TECTONIC_DATA database (tectonics.js) is not loaded.");
 
             // 2. Initialize Lucide Icons
             lucide.createIcons();
@@ -140,8 +141,77 @@
         // Set default layer
         state.map.baseLayers["Dark Matter"].addTo(state.map.instance);
 
+        // Initialize Tectonic Fault Lineaments GeoJSON Layer
+        const tectonicOverlay = L.geoJSON(TECTONIC_DATA, {
+            style: function(feature) {
+                const hasName = feature.properties.NAME && feature.properties.NAME !== "";
+                return {
+                    color: hasName ? "#f43f5e" : "#f59e0b", // Sleek crimson for major faults, amber for secondary lineaments
+                    weight: hasName ? 2.2 : 1.2,
+                    opacity: 0.65,
+                    dashArray: hasName ? "6, 4" : "4, 4",
+                    lineCap: "round",
+                    lineJoin: "round"
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                // Interactive hover state changes
+                layer.on({
+                    mouseover: function(e) {
+                        const hasName = feature.properties.NAME && feature.properties.NAME !== "";
+                        layer.setStyle({
+                            color: hasName ? "#ff0055" : "#ffcc00", // Vibrant glowing hover state colors
+                            weight: hasName ? 3.2 : 2.0,
+                            opacity: 1.0
+                        });
+                        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                            layer.bringToFront();
+                        }
+                    },
+                    mouseout: function(e) {
+                        tectonicOverlay.resetStyle(e.target);
+                    }
+                });
+
+                // Build rich, glassmorphic hover tooltip
+                const props = feature.properties;
+                let tooltipContent = `<div class="tectonic-tooltip">`;
+                if (props.NAME) {
+                    tooltipContent += `<div class="tectonic-tooltip-title">${props.NAME}</div>`;
+                } else {
+                    tooltipContent += `<div class="tectonic-tooltip-title font-minor">Tectonic Lineament</div>`;
+                }
+
+                if (props.TYPE_DESCR) {
+                    tooltipContent += `<div class="tectonic-tooltip-detail"><strong>Type:</strong> ${props.TYPE_DESCR}</div>`;
+                }
+                if (props.SEGMENT) {
+                    tooltipContent += `<div class="tectonic-tooltip-detail"><strong>Segment:</strong> ${props.SEGMENT}</div>`;
+                }
+                if (props.CODE) {
+                    tooltipContent += `<div class="tectonic-tooltip-detail"><strong>Code:</strong> ${props.CODE}</div>`;
+                }
+                tooltipContent += `</div>`;
+
+                layer.bindTooltip(tooltipContent, {
+                    sticky: true,
+                    className: 'glass-tooltip',
+                    direction: 'top',
+                    offset: [0, -5]
+                });
+            }
+        });
+
+        // Add to map by default as background layer context
+        tectonicOverlay.addTo(state.map.instance);
+
+        const overlayLayers = {
+            "Tectonic Faults": tectonicOverlay
+        };
+
         // Add layer selector control
-        L.control.layers(state.map.baseLayers, null, { position: 'topright' }).addTo(state.map.instance);
+        L.control.layers(state.map.baseLayers, overlayLayers, { position: 'topright' }).addTo(state.map.instance);
+
 
         // Listen for base layer changes to adjust aesthetics if necessary
         state.map.instance.on('baselayerchange', (e) => {

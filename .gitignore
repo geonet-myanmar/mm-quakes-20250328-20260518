@@ -4,8 +4,12 @@ DESKTOP.INI
 [Dd]esktop.ini
 Thumbs.db
 
-# Screenshots
+# Screenshots and Media
 Screenshot*.png
+*.mp4
+*.png
+*.jpg
+*.jpeg
 
 # Python files
 __pycache__/
@@ -13,3 +17,7 @@ __pycache__/
 *.pyo
 *.pyd
 .pytest_cache/
+
+# Local tools
+.antigravitycli/
+

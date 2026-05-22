@@ -909,3 +909,63 @@ body {
         padding: 12px;
     }
 }
+
+/* Tectonic Fault Tooltips (Glassmorphic) */
+.glass-tooltip {
+    background: rgba(13, 18, 32, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--shadow-box) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 10px 14px !important;
+    font-family: var(--font-sans) !important;
+}
+
+.glass-tooltip.leaflet-tooltip-top::before {
+    border-top-color: rgba(13, 18, 32, 0.85) !important;
+}
+.glass-tooltip.leaflet-tooltip-bottom::before {
+    border-bottom-color: rgba(13, 18, 32, 0.85) !important;
+}
+.glass-tooltip.leaflet-tooltip-left::before {
+    border-left-color: rgba(13, 18, 32, 0.85) !important;
+}
+.glass-tooltip.leaflet-tooltip-right::before {
+    border-right-color: rgba(13, 18, 32, 0.85) !important;
+}
+
+.tectonic-tooltip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 160px;
+}
+
+.tectonic-tooltip-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--cyan);
+    font-family: var(--font-mono);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+    text-shadow: 0 0 8px var(--cyan-glow);
+}
+
+.tectonic-tooltip-title.font-minor {
+    color: var(--gold);
+    text-shadow: 0 0 8px var(--gold-glow);
+}
+
+.tectonic-tooltip-detail {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+.tectonic-tooltip-detail strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+

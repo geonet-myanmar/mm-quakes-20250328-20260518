@@ -14,6 +14,7 @@ Built entirely with modern web technologies, the portal features a rich dark gla
 * **Seismic Pins Layer**: Custom SVG indicators whose size scales proportionally to Richter magnitude, featuring ambient breathing pulse animations colored by focal depth.
 * **Marker Clustering Layer**: Cleans up high-density seismic zones into beautiful consolidated clusters showing region-wide counts.
 * **Seismic Heatmap Layer**: Evaluates and displays a dynamic intensity gradient showing hotspots of cumulative seismic energy release.
+* **Tectonic Faults Layer**: Custom-styled overlay showcasing tectonic lineaments from the Myanmar Tectonic Map 2011. Highlights active named faults (neon crimson) and secondary lines (amber) with interactive hover animations and detailed glassmorphic tooltips.
 * **Custom Basemaps**: Smooth toggle selector supporting Dark Matter tiles, Voyager (Light), and high-resolution Esri Satellite imagery.
 
 ### 2. Live Analytics Dashboard (Chart.js)
@@ -40,7 +41,7 @@ Built entirely with modern web technologies, the portal features a rich dark gla
 
 ## 💎 Offline-First Architecture & Performance
 To bypass browser security restrictions (CORS) when loading local files and to guarantee **100% offline functionality**:
-* **Data Pre-Compilation**: Uses a Python data packer (`csv_to_js.py`) to convert raw CSV data into a highly optimized, structured JavaScript constant database (`data.js`).
+* **Data Pre-Compilation**: Uses Python data packers (`csv_to_js.py` and `convert_geojson.py`) to convert raw CSV earthquake logs and GeoJSON tectonic features into highly optimized, structured JavaScript constant databases (`data.js` and `tectonics.js`).
 * **Local Library Caching**: Contains all required stylesheets and scripts (Leaflet, Leaflet MarkerCluster, Leaflet Heatmap, Chart.js, Lucide Icons) inside the local `lib/` directory.
 * **Zero External Dependencies**: The entire portal initializes and runs instantly even without an internet connection! Just double-click `index.html` on your desktop.
 
@@ -62,8 +63,11 @@ To bypass browser security restrictions (CORS) when loading local files and to g
 ├── style.css                        # Premium glassmorphic design system and CSS animations
 ├── app.js                           # State controller, Leaflet wrapper, & Chart hooks
 ├── data.js                          # Compiled chronological earthquake JSON database
+├── tectonics.js                     # Pre-packaged local Tectonic Map GeoJSON database
 ├── myanmar_earthquakes.csv          # Raw CSV dataset
+├── Myanmar_Tectonic_Map_2011.geojson # Original tectonic lines GeoJSON dataset
 ├── csv_to_js.py                     # Python parser (CSV -> JS array)
+├── convert_geojson.py               # Python parser (GeoJSON -> JS array)
 ├── download_libs.py                 # Utility script to fetch offline dependencies
 └── README.md                        # Documentation portal
 ```
