@@ -14,7 +14,7 @@ Built entirely with modern web technologies, the portal features a rich dark gla
 * **Seismic Pins Layer**: Custom SVG indicators whose size scales proportionally to Richter magnitude, featuring ambient breathing pulse animations colored by focal depth.
 * **Marker Clustering Layer**: Cleans up high-density seismic zones into beautiful consolidated clusters showing region-wide counts.
 * **Seismic Heatmap Layer**: Evaluates and displays a dynamic intensity gradient showing hotspots of cumulative seismic energy release.
-* **Tectonic Faults Layer**: Custom-styled overlay showcasing tectonic lineaments from the Myanmar Tectonic Map 2011. Highlights active named faults (neon crimson) and secondary lines (amber) with interactive hover animations and detailed glassmorphic tooltips.
+* **Tectonic Faults Layer**: Custom-styled overlay showcasing tectonic lineaments from the Myanmar Tectonic Map 2011 as a single unified background layer. Features a consistent sleek amber styling (`#f59e0b` dash array) that provides non-intrusive geological context, complete with interactive hover transitions and detailed glassmorphic tooltips.
 * **Custom Basemaps**: Smooth toggle selector supporting Dark Matter tiles, Voyager (Light), and high-resolution Esri Satellite imagery.
 
 ### 2. Live Analytics Dashboard (Chart.js)

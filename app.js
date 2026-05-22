@@ -144,12 +144,11 @@
         // Initialize Tectonic Fault Lineaments GeoJSON Layer
         const tectonicOverlay = L.geoJSON(TECTONIC_DATA, {
             style: function(feature) {
-                const hasName = feature.properties.NAME && feature.properties.NAME !== "";
                 return {
-                    color: hasName ? "#f43f5e" : "#f59e0b", // Sleek crimson for major faults, amber for secondary lineaments
-                    weight: hasName ? 2.2 : 1.2,
-                    opacity: 0.65,
-                    dashArray: hasName ? "6, 4" : "4, 4",
+                    color: "#f59e0b", // Uniform sleek amber for all tectonic lineaments
+                    weight: 1.5,
+                    opacity: 0.6,
+                    dashArray: "4, 4",
                     lineCap: "round",
                     lineJoin: "round"
                 };
@@ -158,11 +157,10 @@
                 // Interactive hover state changes
                 layer.on({
                     mouseover: function(e) {
-                        const hasName = feature.properties.NAME && feature.properties.NAME !== "";
                         layer.setStyle({
-                            color: hasName ? "#ff0055" : "#ffcc00", // Vibrant glowing hover state colors
-                            weight: hasName ? 3.2 : 2.0,
-                            opacity: 1.0
+                            color: "#ffcc00", // Vibrant glowing amber hover state color
+                            weight: 2.2,
+                            opacity: 0.95
                         });
                         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                             layer.bringToFront();
